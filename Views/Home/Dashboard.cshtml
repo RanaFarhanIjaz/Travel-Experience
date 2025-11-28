@@ -1,0 +1,43 @@
+@model List<Review>
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Dashboard</h2>
+    <a href="@Url.Action("Add", "Review")" class="btn btn-success">Add New Review</a>
+</div>
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var review in Model)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@review.PlaceName</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@review.PlaceType - @review.Location</h6>
+                        <p class="card-text">@review.Description.Substring(0, Math.Min(150, review.Description.Length))...</p>
+                        <div class="mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span class="text-warning">@(i <= review.Rating ? "★" : "☆")</span>
+                            }
+                            <span class="text-muted">(@review.CreatedDate.ToString("MMM dd, yyyy"))</span>
+                        </div>
+                        <a href="@Url.Action("Details", "Review", new { id = review.Id })" class="btn btn-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <h4>No reviews yet!</h4>
+        <p>Start sharing your travel experiences by adding your first review.</p>
+        <a href="@Url.Action("Add", "Review")" class="btn btn-success">Add Your First Review</a>
+    </div>
+}

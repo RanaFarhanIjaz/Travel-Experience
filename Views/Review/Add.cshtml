@@ -1,0 +1,82 @@
+@model Review
+@{
+    ViewData["Title"] = "Add Review";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Share Your Travel Experience</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="PlaceName">Place Name</label>
+                                <input asp-for="PlaceName" class="form-control" required />
+                                <span asp-validation-for="PlaceName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="PlaceType">Place Type</label>
+                                <select asp-for="PlaceType" class="form-control" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Hotel">Hotel</option>
+                                    <option value="Restaurant">Restaurant</option>
+                                    <option value="VisitingPlace">Visiting Place</option>
+                                </select>
+                                <span asp-validation-for="PlaceType" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Location">Location</label>
+                        <input asp-for="Location" class="form-control" required />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Title">Review Title</label>
+                        <input asp-for="Title" class="form-control" required />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Description">Your Experience</label>
+                        <textarea asp-for="Description" class="form-control" rows="5" required></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Rating">Rating (1-5)</label>
+                                <select asp-for="Rating" class="form-control" required>
+                                    <option value="">Select Rating</option>
+                                    <option value="1">1 Star</option>
+                                    <option value="2">2 Stars</option>
+                                    <option value="3">3 Stars</option>
+                                    <option value="4">4 Stars</option>
+                                    <option value="5">5 Stars</option>
+                                </select>
+                                <span asp-validation-for="Rating" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label>Upload Image</label>
+                                <input type="file" name="image" class="form-control" accept="image/*" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Share Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
