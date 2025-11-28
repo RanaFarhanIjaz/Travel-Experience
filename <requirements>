@@ -1,0 +1,169 @@
+🚀 Quick Start
+Prerequisites
+Before running this project, make sure you have installed:
+
+.NET 8.0 SDK (Required)
+
+Visual Studio Code (Recommended) or any code editor
+
+Git (for cloning the repository)
+
+Step 1: Clone the Repository
+bash
+git clone https://github.com/RanaFarhanIjaz/Travel-Experience.git
+cd Travel-Experience
+Step 2: Get Groq API Key (For AI Features)
+Go to Groq Console
+
+Sign up for a free account
+
+Create a new API key from the dashboard
+
+Copy your API key
+
+Step 3: Configure API Key
+Open Program.cs and replace the placeholder with your actual Groq API key:
+
+csharp
+// In Program.cs, find this line and update it:
+var apiKey = "your-actual-groq-api-key-here"; // ← Replace this with your key
+Step 4: Run the Application
+bash
+# Restore NuGet packages
+dotnet restore
+
+# Build the project
+dotnet build
+
+# Run the application
+dotnet run
+Step 5: Access the Application
+Open your web browser and navigate to:
+
+text
+https://localhost:7000
+or
+
+text
+http://localhost:5000
+Step 6: Default Login Credentials
+Use these credentials to test the application:
+
+Email: admin@travel.com
+
+Password: admin123
+
+🛠️ System Requirements
+Minimum System Requirements
+OS: Windows 10/11, macOS 10.15+, or Linux (Ubuntu 18.04+)
+
+RAM: 4GB minimum, 8GB recommended
+
+Storage: 500MB free space
+
+.NET Version: 8.0 SDK
+
+🔧 Configuration
+Database
+Type: SQLite (file-based, no setup required)
+
+Location: travelshare.db (auto-created on first run)
+
+API Configuration
+Groq API: Required for AI recommendations
+
+Free Tier: 5000 requests/month (generous free limit)
+
+🌟 Features
+✅ Implemented Features
+User Authentication (Register/Login/Logout)
+
+Travel Review Management (CRUD operations)
+
+Image Upload for reviews
+
+Advanced Search with filters
+
+AI-Powered Recommendations using Groq
+
+Responsive Design with Bootstrap 5
+
+Rating System (1-5 stars)
+
+User Dashboard
+
+Session Management
+
+🐛 Troubleshooting
+Common Issues and Solutions
+1. Port Already in Use
+
+bash
+dotnet run --urls="https://localhost:7001"
+2. Database Issues
+
+bash
+rm travelshare.db
+dotnet run
+3. Build Errors
+
+bash
+dotnet clean
+dotnet build
+4. API Key Issues
+
+Ensure Groq API key is correctly set in Program.cs
+
+Check internet connection for API calls
+
+Verify Groq account is active
+
+Error Messages and Fixes
+"Couldn't find .NET SDK"
+
+Install .NET 8.0 SDK from here
+
+"API Key invalid"
+
+Get a new API key from Groq Console
+
+"Database is locked"
+
+Stop the application (Ctrl+C) and restart
+
+📱 Using the Application
+For First-Time Users
+Register a new account or use default credentials
+
+Explore existing reviews on the home page
+
+Use Search to find specific places
+
+Try AI Recommendations for personalized suggestions
+
+Add Your Own Reviews with images and ratings
+
+🔒 Security Features
+Session-based authentication
+
+Password hashing
+
+CSRF protection
+
+Input validation
+
+Secure file upload restrictions
+
+📞 Support
+If you encounter any issues:
+
+Check the Troubleshooting section above
+
+Verify all prerequisites are installed
+
+Ensure API key is properly configured
+
+Check console output for error messages
+
+📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
