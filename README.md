@@ -259,3 +259,4 @@ appsettings.json with Groq API key
 Database can be created
 
 Build succeeds (dotnet build)
+
