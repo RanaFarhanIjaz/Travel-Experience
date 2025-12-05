@@ -1,78 +1,32 @@
-﻿@model List<Review>
-@{
-    ViewData["Title"] = "TravelShare - Home";
-}
-
-<div class="text-center mb-5">
-    <h1 class="display-4">Welcome to TravelShare</h1>
-    <p class="lead">Share your travel experiences and discover amazing places!</p>
-</div>
-
-<!-- Enhanced Search Section -->
-<div class="card shadow mb-5">
-    <div class="card-body p-4">
-        <h5 class="card-title text-center mb-4">Find Your Next Adventure</h5>
-        <form method="get" action="@Url.Action("Search", "Home")" class="row g-3">
-            <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" name="place" class="form-control" placeholder="Search hotels, restaurants, places...">
-                </div>
+﻿<!-- Call to Action -->
+@if (!string.IsNullOrEmpty(Context.Session.GetString("UserEmail")))
+{
+    <div class="text-center mt-5">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h4>Share Your Travel Story</h4>
+                <p class="mb-3">Have an amazing travel experience to share? Add your review with photos and videos!</p>
+                <a href="@Url.Action("Add", "Review")" class="btn btn-success btn-lg">
+                    <i class="fas fa-plus"></i> Add New Review
+                </a>
             </div>
-            <div class="col-md-3">
-                <select name="placeType" class="form-control">
-                    <option value="All">All Categories</option>
-                    <option value="Hotel">Hotels</option>
-                    <option value="Restaurant">Restaurants</option>
-                    <option value="VisitingPlace">Visiting Places</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select name="minRating" class="form-control">
-                    <option value="0">Any Rating</option>
-                    <option value="4">4+ Stars</option>
-                    <option value="3">3+ Stars</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-search"></i> Search
-                </button>
-            </div>
-        </form>
-        <div class="text-center mt-3">
-            <small class="text-muted">
-                <a href="@Url.Action("Search", "Home")" class="text-decoration-none">Advanced Search</a>
-            </small>
         </div>
     </div>
-</div>
-
-<!-- Rest of your existing recent reviews code remains the same -->
-<h3 class="mb-4">Recent Reviews</h3>
-<div class="row">
-    @foreach (var review in Model)
-    {
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                @if (!string.IsNullOrEmpty(review.ImagePath))
-                {
-                    <img src="@review.ImagePath" class="card-img-top" style="height: 200px; object-fit: cover;" alt="@review.PlaceName">
-                }
-                <div class="card-body">
-                    <h5 class="card-title">@review.PlaceName</h5>
-                    <p class="card-text">@review.Description.Substring(0, Math.Min(100, review.Description.Length))...</p>
-                    <div class="mb-2">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            <span class="text-warning">@(i <= review.Rating ? "★" : "☆")</span>
-                        }
-                        <span class="badge bg-secondary ms-2">@review.PlaceType</span>
-                    </div>
-                    <a href="@Url.Action("Details", "Review", new { id = review.Id })" class="btn btn-outline-primary">Read More</a>
-                </div>
+}
+else
+{
+    <div class="text-center mt-5">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h4>Join Our Travel Community</h4>
+                <p class="mb-3">Sign up to share your travel experiences and discover new places!</p>
+                <a href="@Url.Action("Register", "Account")" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </a>
+                <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
             </div>
         </div>
-    }
-</div>
-
+    </div>
+}

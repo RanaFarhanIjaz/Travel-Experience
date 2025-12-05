@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TravelShare.Models;
 using TravelShare.Data;
 using System.Linq;
@@ -16,58 +17,84 @@ namespace TravelShare.Controllers
 
         public IActionResult Index()
         {
-            var recentReviews = _context.Reviews.OrderByDescending(r => r.CreatedDate).Take(6).ToList();
-            return View(recentReviews);
+            // Show featured reviews on home page
+            var featuredReviews = _context.Reviews
+                .OrderByDescending(r => r.Rating)
+                .ThenByDescending(r => r.CreatedDate)
+                .Take(6)
+                .ToList();
+            
+            return View(featuredReviews);
         }
 
-      public IActionResult Dashboard()
-{
-    if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
-    {
-        TempData["ErrorMessage"] = "Please login to access your dashboard.";
-        return RedirectToAction("Login", "Account");
-    }
+        public IActionResult Dashboard()
+        {
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserEmail")))
+            {
+                TempData["ErrorMessage"] = "Please login to view your dashboard.";
+                return RedirectToAction("Login", "Account");
+            }
 
-    var userReviews = _context.Reviews
-        .Where(r => r.Author == HttpContext.Session.GetString("UserEmail"))
-        .OrderByDescending(r => r.CreatedDate)
-        .ToList();
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var isAdmin = HttpContext.Session.GetString("IsAdmin") == "true";
 
-    return View(userReviews);
-}       public IActionResult Search(string place, string placeType, int? minRating)
-{
-    var reviews = _context.Reviews.AsQueryable();
+            List<Review> reviews;
 
-    // Search by place name, location, or description (case-insensitive)
-    if (!string.IsNullOrEmpty(place))
-    {
-        // Convert search term to lowercase for case-insensitive search
-        var searchTerm = place.ToLower();
-        reviews = reviews.Where(r => 
-            r.PlaceName.ToLower().Contains(searchTerm) || 
-            r.Location.ToLower().Contains(searchTerm) ||
-            r.Description.ToLower().Contains(searchTerm)
-        );
-    }
+            if (isAdmin)
+            {
+                // Admin sees ALL reviews
+                reviews = _context.Reviews
+                    .OrderByDescending(r => r.CreatedDate)
+                    .ToList();
+            }
+            else
+            {
+                // Regular users see only their own reviews
+                reviews = _context.Reviews
+                    .Where(r => r.Author == userEmail)
+                    .OrderByDescending(r => r.CreatedDate)
+                    .ToList();
+            }
 
-    // Filter by place type
-    if (!string.IsNullOrEmpty(placeType) && placeType != "All")
-    {
-        reviews = reviews.Where(r => r.PlaceType == placeType);
-    }
+            return View(reviews);
+        }
 
-    // Filter by minimum rating
-    if (minRating.HasValue && minRating > 0)
-    {
-        reviews = reviews.Where(r => r.Rating >= minRating.Value);
-    }
+        public IActionResult Search(string search, string placeType, int minRating = 0)
+        {
+            IQueryable<Review> query = _context.Reviews;
 
-    // Pass search parameters to view
-    ViewBag.SearchPlace = place;
-    ViewBag.SelectedType = placeType;
-    ViewBag.SelectedRating = minRating;
+            // Apply search filter
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(r => 
+                    r.PlaceName.Contains(search) || 
+                    r.Location.Contains(search) || 
+                    r.Description.Contains(search) ||
+                    r.Title.Contains(search));
+            }
 
-    return View(reviews.OrderByDescending(r => r.Rating).ThenByDescending(r => r.CreatedDate).ToList());
-}
+            // Apply place type filter
+            if (!string.IsNullOrEmpty(placeType) && placeType != "All Types")
+            {
+                query = query.Where(r => r.PlaceType == placeType);
+            }
+
+            // Apply rating filter
+            if (minRating > 0)
+            {
+                query = query.Where(r => r.Rating >= minRating);
+            }
+
+            var reviews = query
+                .OrderByDescending(r => r.CreatedDate)
+                .ToList();
+
+            return View(reviews);
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
     }
 }

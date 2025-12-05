@@ -1,0 +1,79 @@
+@model Review
+@{
+    ViewData["Title"] = "Review Details";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <!-- Media Section -->
+            <div class="col-md-6">
+                @if (!string.IsNullOrEmpty(Model.VideoPath))
+                {
+                    <div class="mb-4">
+                        <h5>📹 Travel Video</h5>
+                        <video controls class="img-fluid rounded" style="max-height: 400px; width: 100%;">
+                            <source src="@Model.VideoPath" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <div>
+                        <h5>🖼️ Photos</h5>
+                        <img src="@Model.ImagePath" class="img-fluid rounded" alt="@Model.PlaceName" style="max-height: 400px; width: 100%; object-fit: cover;">
+                    </div>
+                }
+            </div>
+
+            <!-- Review Details -->
+            <div class="col-md-6">
+                <h2>@Model.PlaceName</h2>
+                <div class="mb-3">
+                    <span class="badge bg-primary">@Model.PlaceType</span>
+                    <span class="text-muted ms-2">📍 @Model.Location</span>
+                </div>
+                <div class="mb-3">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <span class="text-warning fs-4">@(i <= Model.Rating ? "★" : "☆")</span>
+                    }
+                    <span class="ms-2">@Model.Rating/5 Stars</span>
+                </div>
+                <h4>@Model.Title</h4>
+                <p class="lead">@Model.Description</p>
+                <div class="text-muted">
+                    <small>Reviewed by @Model.Author on @Model.CreatedDate.ToString("MMMM dd, yyyy")</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="@Url.Action("Search", "Home")" class="btn btn-secondary">Back to Search</a>
+    @if (Context.Session.GetString("UserEmail") == Model.Author)
+    {
+        <a href="@Url.Action("Dashboard", "Home")" class="btn btn-outline-primary ms-2">My Dashboard</a>
+    }
+    
+    <!-- Delete Button - Only show for admin or review owner -->
+    @if (Context.Session.GetString("IsAdmin") == "true" || Context.Session.GetString("UserEmail") == Model.Author)
+    {
+        <form asp-action="Delete" asp-controller="Review" method="post" class="d-inline ms-2" 
+              onsubmit="return confirm('Are you sure you want to delete this review? This action cannot be undone.');">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-danger">Delete Review</button>
+        </form>
+    }
+</div>
+
+<style>
+    video {
+        background-color: #000;
+        border-radius: 8px;
+    }
+</style>

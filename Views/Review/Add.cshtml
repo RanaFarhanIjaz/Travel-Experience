@@ -6,77 +6,194 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header">
-                <h3 class="text-center">Share Your Travel Experience</h3>
+            <div class="card-header bg-primary text-white">
+                <h3 class="text-center mb-0">Share Your Travel Experience</h3>
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label asp-for="PlaceName">Place Name</label>
-                                <input asp-for="PlaceName" class="form-control" required />
-                                <span asp-validation-for="PlaceName" class="text-danger"></span>
+                                <label asp-for="PlaceName" class="form-label">Place Name *</label>
+                                <input asp-for="PlaceName" class="form-control" placeholder="Enter place name" required />
+                                <span asp-validation-for="PlaceName" class="text-danger small"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label asp-for="PlaceType">Place Type</label>
+                                <label asp-for="PlaceType" class="form-label">Place Type *</label>
                                 <select asp-for="PlaceType" class="form-control" required>
                                     <option value="">Select Type</option>
-                                    <option value="Hotel">Hotel</option>
-                                    <option value="Restaurant">Restaurant</option>
-                                    <option value="VisitingPlace">Visiting Place</option>
+                                    <option value="Hotel">🏨 Hotel</option>
+                                    <option value="Restaurant">🍽️ Restaurant</option>
+                                    <option value="VisitingPlace">🏞️ Visiting Place</option>
                                 </select>
-                                <span asp-validation-for="PlaceType" class="text-danger"></span>
+                                <span asp-validation-for="PlaceType" class="text-danger small"></span>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="Location">Location</label>
-                        <input asp-for="Location" class="form-control" required />
-                        <span asp-validation-for="Location" class="text-danger"></span>
+                        <label asp-for="Location" class="form-label">Location *</label>
+                        <input asp-for="Location" class="form-control" placeholder="City, Country" required />
+                        <span asp-validation-for="Location" class="text-danger small"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="Title">Review Title</label>
-                        <input asp-for="Title" class="form-control" required />
-                        <span asp-validation-for="Title" class="text-danger"></span>
+                        <label asp-for="Title" class="form-label">Review Title *</label>
+                        <input asp-for="Title" class="form-control" placeholder="Give your review a title" required />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label asp-for="Description">Your Experience</label>
-                        <textarea asp-for="Description" class="form-control" rows="5" required></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <label asp-for="Description" class="form-label">Your Experience *</label>
+                        <textarea asp-for="Description" class="form-control" rows="5" 
+                                  placeholder="Share your travel experience in detail..." required></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group mb-3">
-                                <label asp-for="Rating">Rating (1-5)</label>
+                                <label asp-for="Rating" class="form-label">Rating *</label>
                                 <select asp-for="Rating" class="form-control" required>
                                     <option value="">Select Rating</option>
-                                    <option value="1">1 Star</option>
-                                    <option value="2">2 Stars</option>
-                                    <option value="3">3 Stars</option>
-                                    <option value="4">4 Stars</option>
-                                    <option value="5">5 Stars</option>
+                                    <option value="1">⭐ (1) Poor</option>
+                                    <option value="2">⭐⭐ (2) Fair</option>
+                                    <option value="3">⭐⭐⭐ (3) Good</option>
+                                    <option value="4">⭐⭐⭐⭐ (4) Very Good</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ (5) Excellent</option>
                                 </select>
-                                <span asp-validation-for="Rating" class="text-danger"></span>
+                                <span asp-validation-for="Rating" class="text-danger small"></span>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group mb-3">
-                                <label>Upload Image</label>
+                                <label class="form-label">📷 Upload Image</label>
                                 <input type="file" name="image" class="form-control" accept="image/*" />
+                                <small class="text-muted">JPG, PNG, GIF (Max 10MB)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label class="form-label">🎥 Upload Video</label>
+                                <input type="file" name="video" class="form-control" accept="video/*" />
+                                <small class="text-muted">MP4, AVI, MOV (Max 50MB)</small>
+                                @if (ViewData.ModelState["video"]?.Errors?.Count > 0)
+                                {
+                                    <span class="text-danger small">@ViewData.ModelState["video"].Errors[0].ErrorMessage</span>
+                                }
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100">Share Review</button>
+                    <!-- Media Preview Section -->
+                    <div class="row mb-3" id="mediaPreview" style="display: none;">
+                        <div class="col-12">
+                            <h6>Media Preview:</h6>
+                            <div id="imagePreview" class="mb-2"></div>
+                            <div id="videoPreview"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-paper-plane"></i> Share Your Review
+                        </button>
+                        <a href="@Url.Action("Dashboard", "Home")" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        // Image preview functionality
+        document.querySelector('input[name="image"]').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const mediaPreview = document.getElementById('mediaPreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="max-height: 150px;" alt="Image preview">`;
+                    mediaPreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+                if (document.getElementById('videoPreview').innerHTML === '') {
+                    mediaPreview.style.display = 'none';
+                }
+            }
+        });
+
+        // Video preview functionality
+        document.querySelector('input[name="video"]').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('videoPreview');
+            const mediaPreview = document.getElementById('mediaPreview');
+            
+            if (file) {
+                const url = URL.createObjectURL(file);
+                preview.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-video"></i> Video selected: ${file.name}
+                        <br><small>Duration preview will be available after upload</small>
+                    </div>
+                `;
+                mediaPreview.style.display = 'block';
+            } else {
+                preview.innerHTML = '';
+                if (document.getElementById('imagePreview').innerHTML === '') {
+                    mediaPreview.style.display = 'none';
+                }
+            }
+        });
+
+        // File size validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const imageInput = document.querySelector('input[name="image"]');
+            const videoInput = document.querySelector('input[name="video"]');
+            
+            // Image size validation (10MB)
+            if (imageInput.files[0] && imageInput.files[0].size > 10 * 1024 * 1024) {
+                e.preventDefault();
+                alert('Image file size must be less than 10MB.');
+                return;
+            }
+            
+            // Video size validation (50MB)
+            if (videoInput.files[0] && videoInput.files[0].size > 50 * 1024 * 1024) {
+                e.preventDefault();
+                alert('Video file size must be less than 50MB.');
+                return;
+            }
+        });
+    </script>
+
+    <style>
+        .form-label {
+            font-weight: 600;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+        }
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+    </style>
+}

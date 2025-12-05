@@ -1,0 +1,374 @@
+@{
+    ViewData["Title"] = "AI Travel Assistant";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="container">
+    <div class="text-center mb-4">
+        <h1>🤖 AI Travel Assistant</h1>
+        <p class="lead">Get instant travel recommendations, tips, and advice from our AI expert</p>
+    </div>
+    
+    <div class="row">
+        <!-- AI Chat -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">💬 Chat with Travel Expert</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Ask anything about travel:</label>
+                        <textarea id="chatMessage" class="form-control" rows="3" 
+                                  placeholder="E.g., 'Best places to visit in Japan in spring?' or 'Travel tips for solo female travelers'"></textarea>
+                    </div>
+                    <button class="btn btn-success" onclick="sendChatMessage()" id="chatButton">
+                        <span class="spinner-border spinner-border-sm d-none" id="chatSpinner"></span>
+                        Ask AI
+                    </button>
+                    
+                    <div id="chatResponse" class="mt-3 p-3 bg-light rounded" style="display: none;">
+                        <div id="chatContent"></div>
+                        <div class="text-end mt-2">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="clearChat()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Travel Recommendations -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📍 Get Travel Recommendations</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Describe what you're looking for:</label>
+                        <input type="text" id="recommendationQuery" class="form-control" 
+                               placeholder="E.g., 'beach destinations with good nightlife' or 'budget-friendly European cities'">
+                    </div>
+                    <button class="btn btn-info" onclick="getRecommendations()" id="recButton">
+                        <span class="spinner-border spinner-border-sm d-none" id="recSpinner"></span>
+                        Get Recommendations
+                    </button>
+                    
+                    <div id="recResponse" class="mt-3 p-3 bg-light rounded" style="display: none;">
+                        <div id="recContent"></div>
+                        <div class="text-end mt-2">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="clearRecommendations()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Tools -->
+        <div class="col-md-4">
+            <!-- Travel Tips -->
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">💡 Travel Tips</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Destination:</label>
+                        <input type="text" id="tipsDestination" class="form-control" placeholder="E.g., 'Thailand' or 'Paris'">
+                    </div>
+                    <button class="btn btn-warning" onclick="getTravelTips()" id="tipsButton">
+                        <span class="spinner-border spinner-border-sm d-none" id="tipsSpinner"></span>
+                        Get Tips
+                    </button>
+                    
+                    <div id="tipsResponse" class="mt-3 p-3 bg-light rounded" style="display: none;">
+                        <div id="tipsContent"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Examples -->
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">📋 Try These Questions:</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <button class="btn btn-sm btn-outline-primary w-100 text-start" onclick="setExample(this, 'chatMessage')">
+                                Best time to visit Italy?
+                            </button>
+                        </li>
+                        <li class="mb-2">
+                            <button class="btn btn-sm btn-outline-primary w-100 text-start" onclick="setExample(this, 'chatMessage')">
+                                Family-friendly destinations in Asia
+                            </button>
+                        </li>
+                        <li class="mb-2">
+                            <button class="btn btn-sm btn-outline-primary w-100 text-start" onclick="setExample(this, 'chatMessage')">
+                                What to pack for Bali in December?
+                            </button>
+                        </li>
+                        <li class="mb-2">
+                            <button class="btn btn-sm btn-outline-primary w-100 text-start" onclick="setExample(this, 'recommendationQuery')">
+                                Romantic getaways under $2000
+                            </button>
+                        </li>
+                        <li>
+                            <button class="btn btn-sm btn-outline-primary w-100 text-start" onclick="setExample(this, 'chatMessage')">
+                                Solo travel safety tips
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+// Debug logging
+console.log('AI Page loaded');
+
+// Get CSRF token
+function getToken() {
+    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+    if (tokenInput) {
+        return tokenInput.value;
+    }
+    console.warn('CSRF token not found');
+    return '';
+}
+
+
+
+// Chat function - SIMPLE VERSION
+async function sendChatMessage() {
+    const message = document.getElementById('chatMessage').value.trim();
+    if (!message) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    console.log('Sending:', message.substring(0, 50) + '...');
+    
+    // Show loading
+    const spinner = document.getElementById('chatSpinner');
+    const button = document.getElementById('chatButton');
+    spinner.classList.remove('d-none');
+    button.disabled = true;
+    
+    try {
+        // Simple fetch request
+        const response = await fetch('/AI/Chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'message=' + encodeURIComponent(message) + '&__RequestVerificationToken=' + getToken()
+        });
+        
+        console.log('Response status:', response.status);
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        // Show response
+        const contentDiv = document.getElementById('chatContent');
+        const responseDiv = document.getElementById('chatResponse');
+        
+        if (data.success) {
+            contentDiv.innerHTML = formatResponse(data.response);
+        } else {
+            contentDiv.innerHTML = '<div class="alert alert-danger">' + (data.message || 'Error') + '</div>';
+        }
+        
+        responseDiv.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('chatContent').innerHTML = 
+            '<div class="alert alert-danger">Network error. Check console.</div>';
+        document.getElementById('chatResponse').style.display = 'block';
+    } finally {
+        spinner.classList.add('d-none');
+        button.disabled = false;
+    }
+}
+
+// Recommendations function
+async function getRecommendations() {
+    const query = document.getElementById('recommendationQuery').value.trim();
+    if (!query) {
+        alert('Please enter a query');
+        return;
+    }
+    
+    console.log('Getting recommendations for:', query);
+    
+    const spinner = document.getElementById('recSpinner');
+    const button = document.getElementById('recButton');
+    spinner.classList.remove('d-none');
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/AI/Recommendations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'query=' + encodeURIComponent(query) + '&__RequestVerificationToken=' + getToken()
+        });
+        
+        const data = await response.json();
+        
+        const contentDiv = document.getElementById('recContent');
+        const responseDiv = document.getElementById('recResponse');
+        
+        if (data.success) {
+            contentDiv.innerHTML = formatResponse(data.recommendations);
+        } else {
+            contentDiv.innerHTML = '<div class="alert alert-danger">' + data.message + '</div>';
+        }
+        
+        responseDiv.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('recContent').innerHTML = 
+            '<div class="alert alert-danger">Network error</div>';
+        document.getElementById('recResponse').style.display = 'block';
+    } finally {
+        spinner.classList.add('d-none');
+        button.disabled = false;
+    }
+}
+
+// Travel tips function
+async function getTravelTips() {
+    const destination = document.getElementById('tipsDestination').value.trim();
+    if (!destination) {
+        alert('Please enter a destination');
+        return;
+    }
+    
+    const spinner = document.getElementById('tipsSpinner');
+    const button = document.getElementById('tipsButton');
+    spinner.classList.remove('d-none');
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/AI/TravelTips', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'destination=' + encodeURIComponent(destination) + '&__RequestVerificationToken=' + getToken()
+        });
+        
+        const data = await response.json();
+        
+        const contentDiv = document.getElementById('tipsContent');
+        const responseDiv = document.getElementById('tipsResponse');
+        
+        if (data.success) {
+            contentDiv.innerHTML = formatResponse(data.tips);
+        } else {
+            contentDiv.innerHTML = '<div class="alert alert-danger">' + data.message + '</div>';
+        }
+        
+        responseDiv.style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('tipsContent').innerHTML = 
+            '<div class="alert alert-danger">Network error</div>';
+        document.getElementById('tipsResponse').style.display = 'block';
+    } finally {
+        spinner.classList.add('d-none');
+        button.disabled = false;
+    }
+}
+
+// Format response text
+function formatResponse(text) {
+    if (!text) return '<div class="alert alert-warning">No response</div>';
+    
+    // Replace newlines with <br>
+    let html = text.replace(/\n/g, '<br>');
+    
+    // Replace markdown headings
+    html = html.replace(/^### (.*?)$/gm, '<h5>$1</h5>');
+    html = html.replace(/^## (.*?)$/gm, '<h4>$1</h4>');
+    html = html.replace(/^# (.*?)$/gm, '<h3>$1</h3>');
+    
+    // Replace bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Replace bullet points
+    html = html.replace(/^[•\-*] (.*?)$/gm, '<li>$1</li>');
+    html = html.replace(/^\d+\. (.*?)$/gm, '<li>$1</li>');
+    
+    // Wrap lists in ul
+    html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+    
+    return '<div class="ai-response">' + html + '</div>';
+}
+
+// Example questions
+function setExample(button, targetId) {
+    const example = button.textContent.trim();
+    document.getElementById(targetId).value = example;
+}
+
+// Clear functions
+function clearChat() {
+    document.getElementById('chatMessage').value = '';
+    document.getElementById('chatResponse').style.display = 'none';
+}
+
+function clearRecommendations() {
+    document.getElementById('recommendationQuery').value = '';
+    document.getElementById('recResponse').style.display = 'none';
+}
+
+// Auto-focus
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('chatMessage').focus();
+});
+</script>
+
+<style>
+.ai-response {
+    line-height: 1.6;
+    font-size: 1rem;
+}
+.ai-response h3 {
+    color: #2c3e50;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+.ai-response h4 {
+    color: #3498db;
+    margin-top: 0.8rem;
+    margin-bottom: 0.4rem;
+    font-size: 1.1rem;
+}
+.ai-response h5 {
+    color: #7f8c8d;
+    margin-top: 0.6rem;
+    margin-bottom: 0.3rem;
+    font-size: 1rem;
+}
+.ai-response ul {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+.ai-response li {
+    margin-bottom: 0.3rem;
+}
+.ai-response strong {
+    color: #e74c3c;
+}
+</style>

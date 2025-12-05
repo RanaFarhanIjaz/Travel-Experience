@@ -23,6 +23,7 @@ namespace TravelShare.Models
         
         public string Location { get; set; } = string.Empty;
         public string? ImagePath { get; set; }
+        public string? VideoPath { get; set; } // New property for video
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public string Author { get; set; } = string.Empty;
     }
